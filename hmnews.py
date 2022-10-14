@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def hell_world():
-    return "Hello World!"
+    return "<h1>Hello World! Welcome to HMNews." #</h1><iframe> src="https://giphy.com/embed/xUPGGDNsLvqsBOhuU0" width="480" height="360" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>"
 
 @app.route("/test")
 def test():
