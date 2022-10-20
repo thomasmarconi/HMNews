@@ -28,7 +28,7 @@ is on port 443 instead of 80 and there is no redirection. The
 SSL certificate is verified and then the rest of what is written
 above happens.
 
-
+One of the first steps in making our website more secure was by adding passwordless ssh. This makes it so that the machine is only accessible through ssh from either my or Thomas’ devices. We also implemented https into our server and routed all http traffic through https. Using https will make our website less susceptible to man in the middle attacks and passive attacks like eavesdropping on communications happening on the site. Another piece of security was using ubuntu’s ufw to only allow incoming traffic from ngnix and ssh. The final piece of security is Auth0 which prevents different types of attacks by adding a login page before using the site, restricting access from unwanted users.
 
 
 
