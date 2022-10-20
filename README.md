@@ -1,5 +1,5 @@
 # HMNews
-
+COP 4521 groupId=19 Thomas Marconi - tcm19, Jack Hayes - jth19e
 Homework assignment 1 starts here.
 How does "curl hmnews.xyz" work? It seems that there are two
 different commands of what's going on here. The first command
