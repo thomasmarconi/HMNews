@@ -70,6 +70,11 @@ def logout():
     )
 
 
+@app.route("/weblogo")
+def weblogo():
+    return render_template("weblogo.html")
+
+
 @app.route("/news")
 def news():
     conn = http.client.HTTPSConnection("hacker-news.firebaseio.com")
@@ -77,7 +82,7 @@ def news():
     conn.request("GET", "/v0/topstories.json?print=pretty", payload)
     res = conn.getresponse()
     data = res.read().decode("utf-8")
-    data = data[2:len(data)-2]
+    data = data[2 : len(data) - 2]
     data = data.split(", ")
     data = [int(x) for x in data]
     conn.close()
@@ -86,8 +91,9 @@ def news():
         conn.request("GET", "/v0/item/{}.json?print=pretty".format(data[x]), payload)
         res2 = conn.getresponse()
         data2.append(res2.read().decode("utf-8"))
-        conn.close()   
-    return render_template("news.html", data2=data2)
+        conn.close()
+    return render_template("news.html", data2=[x.split(":") for x in data2])
+
 
 # allows us to do 'python hello.py' and we dont have to set env variables and do flask run
 if __name__ == "__main__":

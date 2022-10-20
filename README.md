@@ -1,5 +1,27 @@
 # HMNews
 
+Homework assignment 1 starts here.
+How does "curl hmnews.xyz" work? It seems that there are two
+different commands of what's going on here. The first command
+"curl hmnews.xyz" is really "curl http://hmnews.xyz". This 
+firstly goes to some dns resolver to see what IP is 
+associated with hmnews.xyz. It gets that 143.198.176.35 is 
+the IP and sends a request to that IP address. It gets a 
+connection on post 80. Nginx redirects this port to 443 
+which is https. This is where the SSL certificates are
+exchanged and compared to see if the client and server
+are legitimate. To do this it get's the location of the SSL
+certificate on the server and does a series of TLS handshakes
+to verify that the server certificate is legitimate. Now that
+it is connected NGinx serves it the "/" route html page. 
+How it knows what is stored in that route is the flask app. The 
+flask app which is constantly being run by gunicorn returns
+on a request to that route an html template that is stored on
+the server which has been defined in the python code to 
+return whenever a call to that route is issued. 
+
+
+
 
 
 ## Getting started
