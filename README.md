@@ -7,18 +7,26 @@ different commands of what's going on here. The first command
 firstly goes to some dns resolver to see what IP is 
 associated with hmnews.xyz. It gets that 143.198.176.35 is 
 the IP and sends a request to that IP address. It gets a 
-connection on post 80. Nginx redirects this port to 443 
+connection on port 80. Nginx redirects this port to 443 
 which is https. This is where the SSL certificates are
 exchanged and compared to see if the client and server
 are legitimate. To do this it get's the location of the SSL
 certificate on the server and does a series of TLS handshakes
 to verify that the server certificate is legitimate. Now that
-it is connected NGinx serves it the "/" route html page. 
+it is connected, NGinx serves it the "/" route html page. 
 How it knows what is stored in that route is the flask app. The 
 flask app which is constantly being run by gunicorn returns
 on a request to that route an html template that is stored on
 the server which has been defined in the python code to 
-return whenever a call to that route is issued. 
+return whenever a call to that route is issued. The text defined
+in the html template is now displayed to the terminal. The curl
+command then closes the connection and all is well. 
+
+On a similar note, if "curl https://hmnews.xyz" is the command
+pretty much all is the same except that it's inital connection 
+is on port 443 instead of 80 and there is no redirection. The 
+SSL certificate is verified and then the rest of what is written
+above happens.
 
 
 
