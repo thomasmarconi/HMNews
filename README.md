@@ -30,7 +30,7 @@ above happens.
 
 One of the first steps in making our website more secure was by adding passwordless ssh. This makes it so that the machine is only accessible through ssh from either my or Thomas’ devices. We also implemented https into our server and routed all http traffic through https. Using https will make our website less susceptible to man in the middle attacks and passive attacks like eavesdropping on communications happening on the site. Another piece of security was using ubuntu’s ufw to only allow incoming traffic from ngnix and ssh. The final piece of security is Auth0 which prevents different types of attacks by adding a login page before using the site, restricting access from unwanted users.
 
-
+Upgrades and Updates: The steps we will take to update the server will be as follows: 1) create a backup of server with outdated components 2) Shut down the server 3) apt update and apt upgrade 4) make sure server is working correctly, if not restore from backup. We have not yet, but further down the line will create a script to run and help automate the process a little. Updates can be done whenever a component receives a new version.
 
 ## Getting started
 
