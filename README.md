@@ -32,6 +32,13 @@ One of the first steps in making our website more secure was by adding passwordl
 
 Upgrades and Updates: The steps we will take to update the server will be as follows: 1) create a backup of server with outdated components 2) Shut down the server 3) apt update and apt upgrade 4) make sure server is working correctly, if not restore from backup. We have not yet, but further down the line will create a script to run and help automate the process a little. Updates can be done whenever a component receives a new version.
 
+CONFIG FILES: copies of all config files are in /home/gitRepo/hmnews/config folder
+actual ssh config path: /etc/ssh/sshd_config
+actual nginx config path: /etc/nginx/nginx.conf
+actual gunicorn config path: /etc/systemd/system/hmnews.service
+actual auth0 config path: /home/gitRepo/hmnews/.env
+actual dns setting path: /home/gitRepo/hmnews/config/dnsRecords.txt
+
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
