@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve hmnews
+After=network.target
+
+[Service]
+User=thomas
+Group=www-data
+WorkingDirectory=/home/gitRepo/hmnews
+Environment="PATH=/home/gitRepo/hmnews/venv/bin"
+ExecStart=/home/gitRepo/hmnews/venv/bin/gunicorn --workers 3 --bind unix:hmnews.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target

@@ -70,11 +70,6 @@ def logout():
     )
 
 
-@app.route("/weblogo")
-def weblogo():
-    return render_template("weblogo.html")
-
-
 @app.route("/news")
 def news():
     conn = http.client.HTTPSConnection("hacker-news.firebaseio.com")
@@ -94,7 +89,5 @@ def news():
         conn.close()
     return render_template("news.html", data2=[x.split(":") for x in data2])
 
-
-# allows us to do 'python hello.py' and we dont have to set env variables and do flask run
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=env.get("PORT", 3000))

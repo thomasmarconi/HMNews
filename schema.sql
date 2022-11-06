@@ -1,0 +1,20 @@
+DROP TABLE IF EXISTS likes;
+
+CREATE TABLE likes(
+	id INTEGER PRIMARY KEY,
+	url TINYTEXT,
+	title TINYTEXT,
+	keywords MEDIUMTEXT,
+	email TINYTEXT
+
+);
+
+DROP TABLE IF EXISTS dislikes;
+
+CREATE TABLE dislikes(
+	id INTEGER PRIMARY KEY,
+	url TINYTEXT,
+	title TINYTEXT,
+	keywords MEDIUMTEXT,
+	email TINYTEXT
+);

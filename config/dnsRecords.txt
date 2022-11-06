@@ -1,0 +1,9 @@
+#This is a copy of the DNS Record settings on the Digital Ocean website for our project
+Type	HostName	Value					TTL(Seconds)
+-----------------------------------------------------------------------------
+A	www.hmnews.xyz	directs to 143.198.176.35		3600	
+A	hmnews.xyz	directs to 143.198.176.35		3600
+AAAA	hmnews.xyz	directs to 2604:a880:400:d0::2359:8001	3600
+NS	hmnews.xyz	directs to ns2.digitalocean.com		1800
+NS	hmnews.xyz	directs to ns3.digitalocean.com		1800
+NS	hmnews.xyz	directs to ns1.digitalocean.com		1800
