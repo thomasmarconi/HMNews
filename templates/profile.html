@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HMNews</title>
+</head>
+<body>
+	<h1>Welcome {{session["userinfo"]["name"]}}!</h1>
+	<img src = '{{session["userinfo"]["picture"]}}' alt = "Profile Picture" width = 150 >
+	<p>
+		<h2>Likes:</h2>
+		{% for like in likes %}
+			{% if session["userinfo"]["email"] == like[4] %}
+			    <h3><a href={{like[1]}}>{{like[2]}}</a></h3>
+			    <!--Author:{{like[5]}}-->
+			{% endif %}
+		{% endfor %}
+		<h2>Dislikes:</h2>
+		{% for dislike in dislikes %}
+			{% if session["userinfo"]["email"] == dislike[4] %}
+			    <h3><a href={{dislike[1]}}>{{dislike[2]}}</a></h3>
+			{% endif %}
+		{% endfor %}
+	</p>
+</body>

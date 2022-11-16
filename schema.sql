@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS likes;
 
 CREATE TABLE likes(
-	id INTEGER PRIMARY KEY,
+	id TEXT PRIMARY KEY,
 	url TINYTEXT,
 	title TINYTEXT,
 	keywords MEDIUMTEXT,
@@ -12,9 +12,17 @@ CREATE TABLE likes(
 DROP TABLE IF EXISTS dislikes;
 
 CREATE TABLE dislikes(
-	id INTEGER PRIMARY KEY,
+	id TEXT PRIMARY KEY,
 	url TINYTEXT,
 	title TINYTEXT,
 	keywords MEDIUMTEXT,
 	email TINYTEXT
+);
+
+DROP TABLE IF EXISTS articles;
+
+CREATE TABLE articles(
+	id TEXT PRIMARY KEY,
+	url TEXT,
+	title TEXT
 );

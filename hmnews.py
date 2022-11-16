@@ -1,10 +1,10 @@
-import json, http.client
+import json, http.client, sqlite3, requests
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
+from flask import Flask, redirect, render_template, session, url_for, request
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -68,26 +68,66 @@ def logout():
             quote_via=quote_plus,
         )
     )
-
+@app.route("/test2")
+def test2():
+    ids = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json")
+    articles = []
+    listids  = ids.json()
+    for i in range (10):
+        response = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{listids[i]}.json")
+        articles.append(response.json())
+    print(articles)
+    return render_template("test.html", articles=articles)
 
 @app.route("/news")
 def news():
-    conn = http.client.HTTPSConnection("hacker-news.firebaseio.com")
-    payload = "[]"
-    conn.request("GET", "/v0/topstories.json?print=pretty", payload)
-    res = conn.getresponse()
-    data = res.read().decode("utf-8")
-    data = data[2 : len(data) - 2]
-    data = data.split(", ")
-    data = [int(x) for x in data]
+    conn = get_db_connection()
+    data = conn.execute('SELECT * FROM articles').fetchall()
     conn.close()
-    data2 = []
-    for x in range(10):
-        conn.request("GET", "/v0/item/{}.json?print=pretty".format(data[x]), payload)
-        res2 = conn.getresponse()
-        data2.append(res2.read().decode("utf-8"))
-        conn.close()
-    return render_template("news.html", data2=[x.split(":") for x in data2])
+    return render_template("news.html", data=data)
+
+@app.route("/profile")
+def profile():
+    conn = get_db_connection()
+    likes = conn.execute('SELECT * FROM likes').fetchall()
+    dislikes = conn.execute('SELECT * FROM dislikes').fetchall()
+    conn.close()
+    return render_template("profile.html", session=session.get("user"),likes=likes, dislikes=dislikes)    
+@app.route("/admin")
+def admin():
+    session = session.get("user")
+    pretty = json.dumps(session.get("user"))
+    
+@app.route("/like", methods = ["POST","GET"])
+def like():
+    articleId = request.form['articleId']
+    title = request.form['title']
+    url = request.form['url']
+    sess=session.get("user")
+    connection = sqlite3.connect('database.db')
+    connection.execute('INSERT OR IGNORE INTO likes (id, url, title, email) VALUES (?, ?, ?, ?)', (articleId,url,title, sess["userinfo"]["email"]))
+    connection.commit()
+    connection.close()
+    return redirect(url_for('news'))
+
+@app.route("/dislike", methods = ["POST","GET"])
+def dislike():
+    articleId = request.form['articleId'] 
+    title = request.form['title']
+    url = request.form['url']
+    sess=session.get("user")
+    connection = sqlite3.connect('database.db')
+    connection.execute('INSERT OR IGNORE INTO dislikes (id, url, title, email) VALUES (?, ?, ?, ?)', (articleId,url,title, sess["userinfo"]["email"]))
+    connection.commit()
+    connection.close()
+    return redirect(url_for('news'))
+
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=env.get("PORT", 3000))
+

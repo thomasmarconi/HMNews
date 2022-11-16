@@ -1,0 +1,5 @@
+axios.get('https://hacker-news.firebaseio.com/v0/')
+	.then(response -> {
+		console.log(response.data);
+	})
+	.catch(error -> console.error(error));
