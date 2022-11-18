@@ -1,4 +1,4 @@
-import json, http.client, sqlite3, requests, spacy
+import json, http.client, sqlite3, requests, spacy, en_core_web_sm
 from collections import Counter
 from string import punctuation
 from os import environ as env
@@ -192,7 +192,21 @@ def adminEmail(email):
         return False
 
 def findKeywords():
-    nlp = spacy.load("en_core_web_lg")
+    nlp = en_core_web_sm.load()
+    conn = get_db_connection()
+    data = conn.execute('SELECT * FROM articles').fetchall()
+    result = []
+    pos_tag = ['PROPN', 'ADJ', 'NOUN'] # 1
+    doc = nlp(text.lower()) # 2
+    for token in doc:
+        if(token.text in nlp.Defaults.stop_words or token.text in punctuation):
+            continue
+        if(token.pos_ in pos_tag):
+            result.append(token.text)
+    conn.commit()
+    conn.close()
+    return result
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=env.get("PORT", 3000))
