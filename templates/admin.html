@@ -20,7 +20,16 @@
 	<h2>All Users</h2>
 	{% for user in users %}
 	<p>
-		<h3>User: {{user[0]}}</h3>
+		<table>
+			<tr><td><h3>User: {{user[0]}}</h3></td>
+			    	   <td><form action = "/delete" method = "post">
+                        			<input type="hidden" name="email" value="{{ user[0] }}">
+						<input type="hidden" name="operation" value="user">
+                        			<input type="submit" value="Delete User">
+					   </form></td>
+			<tr>
+		</table>
+				
 		<h4>&emsp;Likes:</h4>
                 {% for like in likes %}
                         {% if user[0] == like[4] %}

@@ -1,4 +1,6 @@
-import json, http.client, sqlite3, requests
+import json, http.client, sqlite3, requests, spacy
+from collections import Counter
+from string import punctuation
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
 
@@ -43,13 +45,6 @@ def login():
 
 @app.route("/test")
 def test():
-    sess = session.get("user")
-    email = sess["userinfo"]["email"]
-    conn = get_db_connection()
-    #conn.execute("INSERT OR IGNORE INTO users(email) VALUES (%s)",(email))
-    conn.execute("INSERT INTO users(email) VALUES ('thomas.marconi2@gmail.com')")
-    conn.commit()
-    conn.close()
     return "<h1>You made it to the test page</h1>"
 
 
@@ -83,7 +78,6 @@ def test2():
     for i in range (10):
         response = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{listids[i]}.json")
         articles.append(response.json())
-    print(articles)
     return render_template("test.html", articles=articles)
 
 @app.route("/news")
@@ -106,6 +100,10 @@ def profile():
     return render_template("profile.html", session=session.get("user"),likes=likes, dislikes=dislikes)    
 @app.route("/admin")
 def admin():
+    sess = session.get("user")
+    email = sess["userinfo"]["email"] 
+    if not adminEmail(email):
+        return render_template("notAdmin.html")
     conn = get_db_connection()
     likes = conn.execute('SELECT * FROM likes').fetchall()
     dislikes = conn.execute('SELECT * FROM dislikes').fetchall()
@@ -159,15 +157,18 @@ def dislike():
 
 @app.route("/delete", methods = ["POST", "GET"])
 def delete():
-    email = request.form['email']
-    if not adminEmail(email):
-        return render_template("notAdmin.html")
-    articleId = request.form['articleId']
-    operation = request.form['operation']
     connection = sqlite3.connect('database.db')
-    if operation == "like":
+    email = request.form['email']
+    operation = request.form['operation']
+    if operation == "user":
+        connection.execute('DELETE FROM likes WHERE email=(?)',(email,))
+        connection.execute('DELETE FROM dislikes WHERE email=(?)',(email,))
+        connection.execute('DELETE FROM users WHERE email=(?)',(email,))
+    elif operation == "like":
+        articleId = request.form['articleId']
         connection.execute('DELETE FROM likes WHERE id=(?) AND email=(?)',(articleId,email))
     elif operation == "dislike":
+        articleId = request.form['articleId']
         connection.execute('DELETE FROM dislikes WHERE id=(?) AND email=(?)',(articleId,email))
     connection.commit()
     connection.close()
@@ -181,7 +182,7 @@ def get_db_connection():
 def adminEmail(email):
     if email == "thomas.marconi2@gmail.com":
         return True
-    elif email == "jackemail@gmail.com":
+    elif email == "jackthayes19@gmail.com":
         return True
     elif email == "piyush@gmail.com":
         return True
@@ -190,6 +191,8 @@ def adminEmail(email):
     else:
         return False
 
+def findKeywords():
+    nlp = spacy.load("en_core_web_lg")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=env.get("PORT", 3000))

@@ -17,6 +17,7 @@
 </head>
 <body>
 	<h1>Welcome {{session["userinfo"]["name"]}}!</h1>
+	Email: {{session["userinfo"]["email"]}}
 	<p>
 		<h2>Likes:</h2>
 		{% for like in likes %}
