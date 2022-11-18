@@ -23,8 +23,8 @@ for x in range(10):
     data2.append( json.loads(res2))
     conn.close()
 for x in data2:
-    if("url" in x and "title" in x and "id" in x):
-        connection.execute('INSERT INTO articles (id, url, title) VALUES (?, ?, ?)', (x["id"],x["url"],x["title"]))
+    if("url" in x and "title" in x and "id" in x and "by" in x):
+        connection.execute('INSERT INTO articles (id, url, title, author) VALUES (?, ?, ?, ?)', (x["id"],x["url"],x["title"],x["by"]))
 
 connection.commit()
 connection.close()

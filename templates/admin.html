@@ -1,0 +1,58 @@
+<html lang="en">               
+<head>                          
+    <meta charset="UTF-8">                          
+    <link rel="icon" href="../images/newspaper.png"/>
+    <title>HMNews</title>
+    <nav class="navbar navbar-expand-lg bg-light">
+  <div class="container-fluid">
+          <a class="navbar-brand" href="/news"><h3>News</h3></a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <a class="nav-link" href="/profile">Profile</a>
+          <a class="nav-link" href="/logout">Logout</a>
+      </ul>
+    </div>
+  </div>
+</nav>
+</head>                       
+<body>
+	<h1>Admin Page</h1>
+	<h2>All Users</h2>
+	{% for user in users %}
+	<p>
+		<h3>User: {{user[0]}}</h3>
+		<h4>&emsp;Likes:</h4>
+                {% for like in likes %}
+                        {% if user[0] == like[4] %}
+			<table>    <tr>
+				   <td>&emsp;&emsp;<a href={{like[1]}}>{{like[2]}}</a></td>
+			    	   <td><form action = "/delete" method = "post">
+                        			<input type="hidden" name="articleId" value="{{ like[0] }}">
+                        			<input type="hidden" name="email" value="{{ like[4] }}">
+						<input type="hidden" name="operation" value="like">
+                        			<input type="submit" value="Delete">
+			    		</form></td>
+			    </tr>
+			 </table>
+                            <!--Author:{{like[5]}}-->
+                        {% endif %}
+                {% endfor %}
+		<h4>&emsp;Dislikes:</h4>
+                {% for dislike in dislikes %}
+                        {% if user[0] == dislike[4] %}
+			<table>    
+			    <tr>
+				    <td>&emsp;&emsp;<a href={{dislike[1]}}>{{dislike[2]}}</a></td>
+				    <td><form action = "/delete" method = "post">
+                        			<input type="hidden" name="articleId" value="{{ dislike[0] }}">
+                        			<input type="hidden" name="email" value="{{ dislike[4] }}">
+						<input type="hidden" name="operation" value="dislike">
+                        			<input type="submit" value="Delete">
+                	    		</form></td>
+			    </tr>
+			</table>
+                        {% endif %}
+                {% endfor %}	
+	</p>
+	{% endfor %}
+</body>
