@@ -1,8 +1,11 @@
-import json, http.client, sqlite3, requests, spacy, en_core_web_sm
 from collections import Counter
 from string import punctuation
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
+import json
+import http.client
+import sqlite3
+import requests
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
@@ -86,7 +89,7 @@ def news():
     email = sess["userinfo"]["email"]
     conn = get_db_connection()
     data = conn.execute('SELECT * FROM articles').fetchall()
-    conn.execute("INSERT OR IGNORE INTO users(email) VALUES (?)",(email,))
+    conn.execute("INSERT OR IGNORE INTO users(email) VALUES (?)", (email,))
     conn.commit()
     conn.close()
     return render_template("news.html", data=data)
@@ -97,21 +100,21 @@ def profile():
     likes = conn.execute('SELECT * FROM likes').fetchall()
     dislikes = conn.execute('SELECT * FROM dislikes').fetchall()
     conn.close()
-    return render_template("profile.html", session=session.get("user"),likes=likes, dislikes=dislikes)    
+    return render_template("profile.html", session=session.get("user"), likes=likes, dislikes=dislikes)    
 @app.route("/admin")
 def admin():
     sess = session.get("user")
     email = sess["userinfo"]["email"] 
-    if not adminEmail(email):
+    if not admin_email(email):
         return render_template("notAdmin.html")
     conn = get_db_connection()
     likes = conn.execute('SELECT * FROM likes').fetchall()
     dislikes = conn.execute('SELECT * FROM dislikes').fetchall()
     users = conn.execute('SELECT * FROM users').fetchall()
-    conn.close() 
-    return render_template("admin.html", users=users, likes=likes, dislikes=dislikes) 
-    
-@app.route("/like", methods = ["POST","GET"])
+    conn.close()
+    return render_template("admin.html", users=users, likes=likes, dislikes=dislikes)
+
+@app.route("/like", methods=["POST","GET"])
 def like():
     articleId = request.form['articleId']
     title = request.form['title']
@@ -121,19 +124,19 @@ def like():
     email = sess["userinfo"]["email"] 
     connection = sqlite3.connect('database.db')
     cur = connection.cursor()
-    res = cur.execute('SELECT * FROM likes WHERE id=(?) AND email=(?)',(articleId,email))
+    res = cur.execute('SELECT * FROM likes WHERE id=(?) AND email=(?)', (articleId, email))
     if res.fetchone() is None:
-        cur.execute('INSERT OR IGNORE INTO likes (id, url, title, email, author) VALUES (?, ?, ?, ?, ?)', (articleId,url,title,email,author))
+        cur.execute('INSERT OR IGNORE INTO likes (id, url, title, email, author) VALUES (?, ?, ?, ?, ?)', (articleId, url, title, email, author))
     else:
-        cur.execute('DELETE FROM likes WHERE id=(?) AND email=(?)',(articleId,email))
-    resDis = cur.execute('SELECT * FROM dislikes WHERE id=(?) AND email=(?)',(articleId,email))
+        cur.execute('DELETE FROM likes WHERE id=(?) AND email=(?)', (articleId, email))
+    resDis = cur.execute('SELECT * FROM dislikes WHERE id=(?) AND email=(?)', (articleId, email))
     if resDis.fetchone() is not None:
-        cur.execute('DELETE FROM dislikes WHERE id=(?) AND email=(?)',(articleId,email))
+        cur.execute('DELETE FROM dislikes WHERE id=(?) AND email=(?)', (articleId, email))
     connection.commit()
     connection.close()
     return redirect(url_for('news'))
 
-@app.route("/dislike", methods = ["POST","GET"])
+@app.route("/dislike", methods=["POST","GET"])
 def dislike():
     articleId = request.form['articleId'] 
     title = request.form['title']
@@ -143,33 +146,33 @@ def dislike():
     email = sess["userinfo"]["email"]
     connection = sqlite3.connect('database.db')
     cur = connection.cursor()
-    res = cur.execute('SELECT * FROM dislikes WHERE id=(?) AND email=(?)',(articleId,email))
+    res = cur.execute('SELECT * FROM dislikes WHERE id=(?) AND email=(?)', (articleId, email))
     if res.fetchone() is None:
-        cur.execute('INSERT OR IGNORE INTO dislikes (id, url, title, email, author) VALUES (?, ?, ?, ?, ?)', (articleId,url,title,email,author))
+        cur.execute('INSERT OR IGNORE INTO dislikes (id, url, title, email, author) VALUES (?, ?, ?, ?, ?)', (articleId, url, title, email, author))
     else:
-        cur.execute('DELETE FROM dislikes WHERE id=(?) AND email=(?)',(articleId,email))
-    resLik = cur.execute('SELECT * FROM likes WHERE id=(?) AND email=(?)',(articleId,email))
+        cur.execute('DELETE FROM dislikes WHERE id=(?) AND email=(?)',(articleId, email))
+    resLik = cur.execute('SELECT * FROM likes WHERE id=(?) AND email=(?)',(articleId, email))
     if resLik.fetchone() is not None:
-        cur.execute('DELETE FROM likes WHERE id=(?) AND email=(?)',(articleId,email))
+        cur.execute('DELETE FROM likes WHERE id=(?) AND email=(?)',(articleId, email))
     connection.commit()
     connection.close()
     return redirect(url_for('news'))
 
-@app.route("/delete", methods = ["POST", "GET"])
+@app.route("/delete", methods=["POST", "GET"])
 def delete():
     connection = sqlite3.connect('database.db')
     email = request.form['email']
     operation = request.form['operation']
     if operation == "user":
-        connection.execute('DELETE FROM likes WHERE email=(?)',(email,))
-        connection.execute('DELETE FROM dislikes WHERE email=(?)',(email,))
-        connection.execute('DELETE FROM users WHERE email=(?)',(email,))
+        connection.execute('DELETE FROM likes WHERE email=(?)', (email,))
+        connection.execute('DELETE FROM dislikes WHERE email=(?)', (email,))
+        connection.execute('DELETE FROM users WHERE email=(?)', (email,))
     elif operation == "like":
         articleId = request.form['articleId']
-        connection.execute('DELETE FROM likes WHERE id=(?) AND email=(?)',(articleId,email))
+        connection.execute('DELETE FROM likes WHERE id=(?) AND email=(?)', (articleId, email))
     elif operation == "dislike":
         articleId = request.form['articleId']
-        connection.execute('DELETE FROM dislikes WHERE id=(?) AND email=(?)',(articleId,email))
+        connection.execute('DELETE FROM dislikes WHERE id=(?) AND email=(?)', (articleId, email))
     connection.commit()
     connection.close()
     return redirect(url_for('admin'))
@@ -179,35 +182,17 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def adminEmail(email):
+def admin_email(email):
     if email == "thomas.marconi2@gmail.com":
         return True
     elif email == "jackthayes19@gmail.com":
         return True
     elif email == "piyush@gmail.com":
         return True
-    elif email == "chashi@gmail.com":
+    elif email == "chashimahiulislam@gmail.com":
         return True
     else:
         return False
 
-def findKeywords():
-    nlp = en_core_web_sm.load()
-    conn = get_db_connection()
-    data = conn.execute('SELECT * FROM articles').fetchall()
-    result = []
-    pos_tag = ['PROPN', 'ADJ', 'NOUN'] # 1
-    doc = nlp(text.lower()) # 2
-    for token in doc:
-        if(token.text in nlp.Defaults.stop_words or token.text in punctuation):
-            continue
-        if(token.pos_ in pos_tag):
-            result.append(token.text)
-    conn.commit()
-    conn.close()
-    return result
-
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=env.get("PORT", 3000))
-

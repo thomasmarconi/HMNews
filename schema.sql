@@ -4,5 +4,6 @@ CREATE TABLE articles(
 	id TEXT PRIMARY KEY,
 	url TEXT,
 	title TEXT,
-	author TEXT
+	author TEXT,
+	keywords MEDIUMTEXT
 );
