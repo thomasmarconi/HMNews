@@ -1,6 +1,6 @@
 # HMNews
 COP 4521 groupId=19 Thomas Marconi - tcm19, Jack Hayes - jth19e
-##Homework assignment 1
+# Homework assignment 1
 How does "curl hmnews.xyz" work? It seems that there are two
 different commands of what's going on here. The first command
 "curl hmnews.xyz" is really "curl http://hmnews.xyz". This 
@@ -34,7 +34,7 @@ One of the first steps in making our website more secure was by adding passwordl
 # Upgrades And Updates
 Upgrades and Updates: The steps we will take to update the server will be as follows: 1) create a backup of server with outdated components 2) Shut down the server 3) apt update and apt upgrade 4) make sure server is working correctly, if not restore from backup. We have not yet, but further down the line will create a script to run and help automate the process a little. Updates can be done whenever a component receives a new version.
 
-## Config Files
+# Config Files
 Copies of all config files are in /home/gitRepo/hmnews/config folder
 actual ssh config path: /etc/ssh/sshd_config
 actual nginx config path: /etc/nginx/nginx.conf
