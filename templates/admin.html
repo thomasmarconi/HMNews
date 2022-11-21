@@ -25,6 +25,7 @@
 			    	   <td><form action = "/delete" method = "post">
                         			<input type="hidden" name="email" value="{{ user[0] }}">
 						<input type="hidden" name="operation" value="user">
+						<input type="hidden" name="origin" value="admin">
                         			<input type="submit" value="Delete User">
 					   </form></td>
 			<tr>
@@ -35,15 +36,17 @@
                         {% if user[0] == like[4] %}
 			<table>    <tr>
 				   <td>&emsp;&emsp;<a href={{like[1]}}>{{like[2]}}</a></td>
+				   <td>Author:{{like[5]}}</td>
+				   <td>Keywords:{{like[3]}}</td>
 			    	   <td><form action = "/delete" method = "post">
                         			<input type="hidden" name="articleId" value="{{ like[0] }}">
                         			<input type="hidden" name="email" value="{{ like[4] }}">
 						<input type="hidden" name="operation" value="like">
+						<input type="hidden" name="origin" value="admin">
                         			<input type="submit" value="Delete">
 			    		</form></td>
 			    </tr>
 			 </table>
-                            <!--Author:{{like[5]}}-->
                         {% endif %}
                 {% endfor %}
 		<h4>&emsp;Dislikes:</h4>
@@ -52,10 +55,13 @@
 			<table>    
 			    <tr>
 				    <td>&emsp;&emsp;<a href={{dislike[1]}}>{{dislike[2]}}</a></td>
+				    <td>Author:{{dislike[5]}}</td>
+				    <td>Keywords:{{dislike[3]}}</td>
 				    <td><form action = "/delete" method = "post">
                         			<input type="hidden" name="articleId" value="{{ dislike[0] }}">
                         			<input type="hidden" name="email" value="{{ dislike[4] }}">
 						<input type="hidden" name="operation" value="dislike">
+						<input type="hidden" name="origin" value="admin">
                         			<input type="submit" value="Delete">
                 	    		</form></td>
 			    </tr>

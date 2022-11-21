@@ -23,7 +23,20 @@
 		{% for like in likes %}
 			{% if session["userinfo"]["email"] == like[4] %}
 			<table>
-				<tr><td><h3><a href={{like[1]}}>{{like[2]}}</a></h3></td> <td>Author: {{like[5]}}</td></tr>
+				<tr>
+					<td><h3><a href={{like[1]}}>{{like[2]}}</a></h3></td> 
+					<td>Author: {{like[5]}}</td>
+					<td><form action = "/delete" method = "post">
+                                                <input type="hidden" name="articleId" value="{{ like[0] }}">
+                                                <input type="hidden" name="email" value="{{ like[4] }}">
+                                                <input type="hidden" name="operation" value="like">
+						<input type="hidden" name="origin" value="profile">
+                                                <input type="submit" value="Delete">
+                                        </form></td>
+				</tr>
+				<tr>
+					<td>Keywords: {{like[3]}}</td>
+				</tr>
 			</table>
 			{% endif %}
 		{% endfor %}
@@ -31,7 +44,20 @@
 		{% for dislike in dislikes %}
 			{% if session["userinfo"]["email"] == dislike[4] %}
 			<table>
-				<tr><td><h3><a href={{dislike[1]}}>{{dislike[2]}}</a></h3></td> <td>Author: {{dislike[5]}}</td></tr>
+				<tr>
+					<td><h3><a href={{dislike[1]}}>{{dislike[2]}}</a></h3></td> 
+					<td>Author: {{dislike[5]}}</td>
+					<td><form action = "/delete" method = "post">
+                                                <input type="hidden" name="articleId" value="{{ dislike[0] }}">
+                                                <input type="hidden" name="email" value="{{ dislike[4] }}">
+                                                <input type="hidden" name="operation" value="dislike">
+						<input type="hidden" name="origin" value="profile">
+                                                <input type="submit" value="Delete">
+                                        </form></td>
+				</tr>	
+				<tr>
+					<td>Keywords: {{dislike[3]}}</td>
+				</tr>
 			</table>
 			{% endif %}
 		{% endfor %}

@@ -1,40 +1,36 @@
 """this script is run every hour to fetch updated articles"""
 from collections import Counter
 from string import punctuation
-from urllib.request import urlopen
 import json
 import http.client
 import sqlite3
 import spacy
-import en_core_web_sm
+import requests
 from bs4 import BeautifulSoup
 
-nlp = spacy.load('en_core_web_sm')
+NLP = spacy.load('en_core_web_sm')
 
 def find_keywords(text):
     """scrapes articles to find keywords"""
-    print("in find_keywords")
     result = []
     pos_tag = ['PROPN', 'ADJ', 'NOUN'] # 1
-    doc = nlp(text.lower()) # 2
-    print("here")
+    doc = NLP(text.lower())
     for token in doc:
-        if(token.text in nlp.Defaults.stop_words or token.text in punctuation):
+        if(token.text in NLP.Defaults.stop_words or token.text in punctuation):
             continue
         if token.pos_ in pos_tag:
-            print("appending")
+            #print("appending")
             result.append(token.text)
-    print("here3")
     result = [(x[0]) for x in Counter(result).most_common(5)]
     result = " ".join(result)
     return result
 
 def get_text_from_html(url):
     """used to get text from html page, helps to scrape fot keywords"""
-    #https://stackoverflow.com/questions/328356/extracting-text-from-html-file-using-python -- MattDMo
-    print("in get_text")
-    html = urlopen(url).read()
-    soup = BeautifulSoup(html, features="html.parser")
+    #https://stackoverflow.com/questions/328356/
+    #extracting-text-from-html-file-using-python -- MattDMo
+    html = requests.get(url)
+    soup = BeautifulSoup(html.content, features="html.parser", from_encoding="iso-8859-1")
     # kill all script and style elements
     for script in soup(["script", "style"]):
         script.extract()    # rip it out
@@ -46,12 +42,13 @@ def get_text_from_html(url):
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
+    html.close()
     return text
 
-CONNECTION = sqlite3.connect('database.db')
+CONNECTION = sqlite3.connect('/home/gitRepo/hmnews/database.db')
 
 
-with open('schema.sql') as f:
+with open('/home/gitRepo/hmnews/schema.sql') as f:
     CONNECTION.executescript(f.read())
 
 CONN = http.client.HTTPSConnection("hacker-news.firebaseio.com")
@@ -64,7 +61,7 @@ DATA = DATA.split(", ")
 DATA = [int(x) for x in DATA]
 CONN.close()
 DATA2 = []
-for x in range(10):
+for x in range(65):
     CONN.request("GET", "/v0/item/{}.json?print=pretty".format(DATA[x]), PAYLOAD)
     RES2 = CONN.getresponse()
     RES2 = RES2.read().decode("utf-8")
@@ -74,7 +71,9 @@ for x in DATA2:
     if("url" in x and "title" in x and "id" in x and "by" in x):
         keywords = find_keywords(get_text_from_html(x["url"]))
         print(keywords)
-        CONNECTION.execute('INSERT INTO articles (id, url, title, author, keywords) VALUES (?, ?, ?, ?, ?)', (x["id"], x["url"], x["title"], x["by"], keywords))
+        CONNECTION.execute(
+            'INSERT INTO articles (id, url, title, author, keywords) VALUES (?, ?, ?, ?, ?)',
+            (x["id"], x["url"], x["title"], x["by"], keywords))
 
 CONNECTION.commit()
 CONNECTION.close()

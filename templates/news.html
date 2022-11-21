@@ -42,16 +42,19 @@
 					<input type="hidden" name="url" value="{{ x['url'] }}">
 					<input type="hidden" name="title" value="{{ x['title'] }}">
 					<input type="hidden" name="author" value="{{ x['author'] }}">
+					<input type="hidden" name="keywords" value="{{ x['keywords'] }}">
 					<input type="submit" value="Like">
-				</form></td>
+					</form> 
+				</td>
 				<td><form action = "/dislike" method = "post">
 					<input type="hidden" name="articleId" value="{{ x['id'] }}">
 					<input type="hidden" name="url" value="{{ x['url'] }}">
 					<input type="hidden" name="title" value="{{ x['title'] }}">
 					<input type="hidden" name="author" value="{{ x['author'] }}">
+					<input type="hidden" name="keywords" value="{{ x['keywords'] }}">
 					<input type="submit" value="Dislike">
 				</form></td></tr>
-			<!--<tr><td>Keywords: {{ x['Keywords'] }}</td></tr>-->
+			<tr><td>Keywords: {{ x['keywords'] }}</td></tr>
 	    	</table>
 	    </p>
         </div>
