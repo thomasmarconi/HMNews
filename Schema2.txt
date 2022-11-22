@@ -1,12 +1,13 @@
 DROP TABLE IF EXISTS likes;
 
 CREATE TABLE likes(
-        id TEXT PRIMARY KEY,
+        id TEXT,
         url TINYTEXT,
         title TINYTEXT,
         keywords MEDIUMTEXT,
         email TINYTEXT,
-        author TEXT
+        author TEXT,
+	PRIMARY KEY(id,email)
 
 );
 
@@ -19,11 +20,12 @@ CREATE TABLE users(
 DROP TABLE IF EXISTS dislikes;
 
 CREATE TABLE dislikes(
-        id TEXT PRIMARY KEY,
+        id TEXT,
         url TINYTEXT,
         title TINYTEXT,
         keywords MEDIUMTEXT,
         email TINYTEXT,
-        author TEXT
+        author TEXT,
+	PRIMARY KEY(id,email)
 );
 //used to create other tables in db

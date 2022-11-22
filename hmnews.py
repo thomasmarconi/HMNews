@@ -75,18 +75,12 @@ def news():
     email = sess["userinfo"]["email"]
     conn = get_db_connection()
     data = conn.execute('SELECT * FROM articles').fetchall()
-    #likes = conn.execute('SELECT id FROM likes').fetchall()
-    #likeDic = dict()
-    #for artId in likes: #adds 1 instance of each id to dic
-    #    likeDic[artId[0]] = 0
-    #for artId in likes:
-    #    val = likeDic[artId[0]]
-    #    val = val + 1
-    #    likeDic[artId[0]] = val
+    likes = conn.execute('SELECT * FROM likes').fetchall()
+    dislikes = conn.execute('SELECT * FROM dislikes').fetchall()
     conn.execute("INSERT OR IGNORE INTO users(email) VALUES (?)", (email,))
     conn.commit()
     conn.close()
-    return render_template("news.html", data=data)
+    return render_template("news.html", data=data, likes=likes, dislikes=dislikes, email=email)
 
 @app.route("/profile")
 def profile():

@@ -1,3 +1,5 @@
+
+
 CREATE TABLE IF NOT EXISTS articles(
         id TEXT PRIMARY KEY,
         url TEXT,
