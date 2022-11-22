@@ -21,7 +21,7 @@ def find_keywords(text):
         if token.pos_ in pos_tag:
             #print("appending")
             result.append(token.text)
-    result = [(x[0]) for x in Counter(result).most_common(5)]
+    result = [(x[0]) for x in Counter(result).most_common(3)]
     result = " ".join(result)
     return result
 
@@ -69,11 +69,19 @@ for x in range(65):
     CONN.close()
 for x in DATA2:
     if("url" in x and "title" in x and "id" in x and "by" in x):
-        keywords = find_keywords(get_text_from_html(x["url"]))
-        print(keywords)
-        CONNECTION.execute(
-            'INSERT INTO articles (id, url, title, author, keywords) VALUES (?, ?, ?, ?, ?)',
-            (x["id"], x["url"], x["title"], x["by"], keywords))
+        check = CONNECTION.execute("""SELECT * FROM tempArticles WHERE id==(?)""", (x["id"],))
+        check = check.fetchone()
+        if check is None:
+            keywords = find_keywords(get_text_from_html(x["url"]))
+            print(keywords)
+            CONNECTION.execute(
+                'INSERT INTO articles (id, url, title, author, keywords) VALUES (?, ?, ?, ?, ?)',
+                (x["id"], x["url"], x["title"], x["by"], keywords))
+        else:
+            print(check[4])
+            CONNECTION.execute(
+                'INSERT INTO articles (id, url, title, author, keywords) VALUES (?, ?, ?, ?, ?)',
+                (check[0], check[1], check[2], check[3], check[4]))
 
 CONNECTION.commit()
 CONNECTION.close()

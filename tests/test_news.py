@@ -1,3 +1,20 @@
+from hmnews import app
+import pytest
+import os
+import environ as env
+@pytest.fixture()
+def cli():
+    app.config.update({
+        'TESTING': True,
+        'SECRET_KEY': env.get('AUTH0_CLIENT_SECRET')
+    })
+    yield app
+
+def test_news(cli):
+    response = client.test_client().get('/')
+    assert response.status_code == 200
+
+"""
 from os import environ as env
 import pytest
 
@@ -23,17 +40,10 @@ OAUTH.register(
     server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
 )
 
-@pytest.fixture()
-def cli():
-    app.config.update({
-        'TESTING': True,
-        'SECRET_KEY': env.get('AUTH0_CLIENT_SECRET')
-    })
-    yield app
 
 def test_news(cli):
     with cli.test_client() as client:
         with client.session_transaction() as session:
-            token = OAUTH.auth0.authorize_access_token()
-            session['user'] = token
-        assert client.get('/news').status_code == 200
+            response = client.get('/')
+    assert response.status_code == 200
+"""
