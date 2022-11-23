@@ -42,4 +42,65 @@ actual gunicorn config path: /etc/systemd/system/hmnews.service
 actual auth0 config path: /home/gitRepo/hmnews/.env
 actual dns setting path: /home/gitRepo/hmnews/config/dnsRecords.txt
 
+# Ease of Installation of the software
+To get our repo running on your machine you need to install and set up a few things. Nginx, gunicorn, flask, certbot, auth0, ufw, and crontab all need to be set up. There are two main tutorials for helping with these: https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-22-04 and https://auth0.com/docs/quickstart/webapp/python/interactive. We'll start with cloning the repo to your server. Cd to your desired directory and run the command git clone https://gitlab.com/thomasmarconi/hmnews.git. Authenticate with your git credentials and then cd into hmnews. Next you should have a lot of the required dependencies for things in the venv folder so you can hop right into configuring gunicorn. Run "sudo apt update sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev python3-setuptools". Then go ahead and hop into the virtual environment with "source venv/bin/activate" All of these next packages should be installed but we'll run the commands just in case. Run "pip install wheel" and "pip install gunicorn flask". Let's just quickly to configuring your firewall. Assuming it's off go ahead and allow your desired ports with "sudo ufw allow <portNum>". You at least need to do "sudo ufw allow 80", "sudo ufw allow 22" and "sudo ufw allow 443". Then do "sudo ufw enable". Jumping back to gunicorn go ahead and run "gunicorn --bind 0.0.0.0:5000 wsgi:app" Now we need to make a systemd service unit file. We'll do this by sudo nano /etc/systemd/system/<yourProject>.service. In this file write: 
 
+[Unit]
+Description=Gunicorn instance to serve hmnews
+After=network.target
+
+[Service]
+User="yourUser"
+Group=www-data
+WorkingDirectory=<absPathToRepo>
+Environment="PATH=<absPathToRepo>/venv/bin"
+ExecStart=<absPathToRepo>/venv/bin/gunicorn --workers 3 --bind unix:hmnews.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
+
+Save and exit the file. Then run "sudo systemctl start <yourProject>" and "sudo systemctl enable <yourProject>". Check the status with "sudo systemctl status <yourProject>" Next to configure nginx create a file by "sudo nano /etc/nginx/sites-available/<yourSite>" In this file write: 
+
+server {
+	add_header Content-Security-Policy "default-src 'self'; img-src 'self';" always;
+	add_header Strict-Transport-Security 'max-age=31536000; includeSubDomains; preload';
+	add_header X-XSS-Protection "1; mode=block";
+	add_header X-Frame-Options "SAMEORIGIN";
+	add_header X-Content-Type-Options nosniff;
+	add_header Referrer-Policy "strict-origin";
+	add_header Permissions-Policy "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()";
+	server_name <yourUrl> www.<yourUrl>;
+
+	location / {
+		include proxy_params;
+		proxy_pass http://unix:<absPathToRepo>/hmnews/hmnews.sock;
+	}
+
+	location /images/ {
+		root <absPathToRepo>/hmnews;
+	}
+}
+server {
+	listen 80;
+	listen [::]:80;
+	server_name <yourDomain> www.<yourDomain>;
+	return 301 https://<yourDomain>$request_uri;
+}
+
+Save and exit this file. Then like the file to site-enabled with "sudo ln -s /etc/nginx/sites-available/myproject /etc/nginx/sites-enabled" and you can text it for syntax error with "sudo nginx -t". Start nginx with "sudo systemctl restart nginx". Now to configure certbot. Run "sudo apt install python3-certbot-nginx" and then "sudo certbot --nginx -d your_domain -d www.your_domain" This should give you SSL certificates and it'll update your nginx conf file. Now if you're not in your virtual environment go back into that with "source venv/bin/activate". Run "pip install -r requirements.txt" Now you'll have to change the .env file in the repo with the information with your Auth0 program. That will look like:
+# 📁 .env -----
+
+AUTH0_CLIENT_ID=YOUR_CLIENT_ID
+AUTH0_CLIENT_SECRET=YOUR_CLIENT_SECRET
+AUTH0_DOMAIN=YOUR_DOMAIN
+APP_SECRET_KEY=
+
+and Generate a string for APP_SECRET_KEY using openssl rand -hex 32 from your shell. The other values can be found on your auth0 application settings page. On this page you should set the Application Login Uri to https://<yourDomain>/login. You allowed callback URLs https://<yourDomain>/callback and your Allowed Logout URL to https://<yourDomain>/. You should save those settings on the website. Then in your server you need to make a few changed to  run the reload.sh script on server. Replace where it says hmnews with <yourProject>. Then run the script and you should be able to access the website through https://<yourDomain>. If there are issues you can run sudo systemctl status <yourProject>.
+
+To setup crontab run sudo crontab -e and write these lines in the file:
+0 * * * * systemctl stop <yourProject>
+0 * * * * /usr/bin/python3 <absPathToRepo>/hmnews/init_db.py
+0 * * * * systemctl daemon-reload
+0 * * * * systemctl start <yourProject>
+0 * * * * systemctl enable <yourProject>
+0 * * * * systemctl start <yourProject>
